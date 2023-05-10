@@ -113,15 +113,15 @@ impl <F:Float> KGraphStat<F> {
 #[derive(Clone)]
 pub struct KGraph<F> {
     /// max number of neighbours of each node. Note it can a little less than computed in Hnsw
-    pub(crate) max_nbng : usize,
+    pub max_nbng : usize,
     /// number of nodes.
     /// If GraphK is initialized from the descendant of a point in Hnsw we do not know in advance the number of nodes!!
-    pub(crate) nbnodes: usize,
+    pub nbnodes: usize,
     /// neighbours\[i\] contains the indexes of neighbours node i sorted by increasing weight edge!
     /// all node indexing is done after indexation in node_set
-    pub(crate) neighbours : Vec<Vec<OutEdge<F>>>,
+    pub neighbours : Vec<Vec<OutEdge<F>>>,
     /// to keep track of current node indexes.
-    pub(crate) node_set : IndexSet<DataId>,
+    pub node_set : IndexSet<DataId>,
 }   // end of struct KGraph
 
 
