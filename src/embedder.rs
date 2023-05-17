@@ -15,7 +15,7 @@
 //!  in fact it is f32 or f64.
 
 
-
+use log::info;
 
 use num_traits::{Float, NumAssign};
 
@@ -167,7 +167,7 @@ where
             log::error!("Embedder::h_embed first step failed");
             return res_first;
         }
-        println!(" first step embedding sys time(ms) {:.2e} cpu time(ms) {:.2e}", sys_start.elapsed().unwrap().as_millis(), cpu_start.elapsed().as_millis());
+        info!(" first step embedding sys time(ms) {:.2e} cpu time(ms) {:.2e}", sys_start.elapsed().unwrap().as_millis(), cpu_start.elapsed().as_millis());
         // get initial embedding
         let large_graph = graph_projection.get_large_graph();
         log::info!("computing proba edges for large graph ...");
@@ -177,7 +177,7 @@ where
         // use projection to initialize large graph
         let quant = graph_projection.get_projection_distance_quant();
         if quant.count() > 0 {
-            println!(" projection distance quantile at 0.05 : {:.2e} , 0.5 :  {:.2e}, 0.95 : {:.2e}, 0.99 : {:.2e}", 
+            info!(" projection distance quantile at 0.05 : {:.2e} , 0.5 :  {:.2e}, 0.95 : {:.2e}, 0.99 : {:.2e}", 
                         quant.query(0.05).unwrap().1, quant.query(0.5).unwrap().1, 
                         quant.query(0.95).unwrap().1, quant.query(0.99).unwrap().1);
         };
@@ -213,7 +213,7 @@ where
         log::debug!("optimizing second step");
         let embedding_res = self.entropy_optimize(&self.parameters, self.initial_embedding.as_ref().unwrap());
         //
-        println!(" first + second step embedding sys time(s) {:.2e} cpu time(s) {:.2e}", sys_start.elapsed().unwrap().as_secs(), cpu_start.elapsed().as_secs());
+        info!(" first + second step embedding sys time(s) {:.2e} cpu time(s) {:.2e}", sys_start.elapsed().unwrap().as_secs(), cpu_start.elapsed().as_secs());
         //
         match embedding_res {
             Ok(embedding) => {
@@ -245,7 +245,7 @@ where
             let cpu_start = ProcessTime::now();
             let sys_start = SystemTime::now();
             initial_embedding = get_dmap_embedding(self.initial_space.as_ref().unwrap(), self.parameters.get_dimension(), None);
-            println!(" dmap initialization sys time(ms) {:.2e} cpu time(ms) {:.2e}", sys_start.elapsed().unwrap().as_millis(), cpu_start.elapsed().as_millis());
+            info!(" dmap initialization sys time(ms) {:.2e} cpu time(ms) {:.2e}", sys_start.elapsed().unwrap().as_millis(), cpu_start.elapsed().as_millis());
             set_data_box(&mut initial_embedding, 1.);
         }
         else {
@@ -526,9 +526,9 @@ where
         // some stats
         let nb_without_match = nodes_match.iter().fold(0, |acc, x| if *x == 0 {acc +1} else {acc});
         let mean_nbmatch: f64 = nodes_match.iter().sum::<usize>() as f64 /nodes_match.len() as f64;
-        println!("\n\n a guess at quality ");
-        println!("\n nb_without_match : {},  mean nb match if match : {:.3e}", nb_without_match,  mean_nbmatch);
-        println!("\n best distance in neighbourhood quantiles at 0.05 : {:.2e} , 0.25 : {:.2e}, 0.5 :  {:.2e}, 0.75 : {:.2e} 0.95 : {:.2e}, 0.99 : {:.2e} \n\n", 
+        info!("\n\n a guess at quality ");
+        info!("\n nb_without_match : {},  mean nb match if match : {:.3e}", nb_without_match,  mean_nbmatch);
+        info!("\n best distance in neighbourhood quantiles at 0.05 : {:.2e} , 0.25 : {:.2e}, 0.5 :  {:.2e}, 0.75 : {:.2e} 0.95 : {:.2e}, 0.99 : {:.2e} \n\n", 
             missed_dist_q.query(0.05).unwrap().1, missed_dist_q.query(0.25).unwrap().1, missed_dist_q.query(0.5).unwrap().1, 
             missed_dist_q.query(0.75).unwrap().1, missed_dist_q.query(0.95).unwrap().1, missed_dist_q.query(0.99).unwrap().1);
         // The smaller the better!
@@ -598,7 +598,7 @@ where
         let start = ProcessTime::now();
         let initial_ce = ce_optimization.ce_compute_threaded();
         let cpu_time: Duration = start.elapsed();
-        println!(" initial cross entropy value {:.2e},  in time {:?}", initial_ce, cpu_time);
+        info!(" initial cross entropy value {:.2e},  in time {:?}", initial_ce, cpu_time);
         // We manage some iterations on gradient computing
         let grad_step_init = params.grad_step;
         log::info!("grad_step_init : {:.2e}", grad_step_init);
@@ -616,12 +616,12 @@ where
             let grad_step = grad_step_init * (1.- iter as f64/self.get_nb_grad_batch() as f64);
             ce_optimization.gradient_iteration_threaded(nb_sample_by_iter, grad_step);
 //            let cpu_time: Duration = start.elapsed();
-//            println!("ce after grad iteration time {:?} grad iter {:.2e}",  cpu_time, ce_optimization.ce_compute_threaded());
+//            info!("ce after grad iteration time {:?} grad iter {:.2e}",  cpu_time, ce_optimization.ce_compute_threaded());
 //            log::debug!("ce after grad iteration time(ms) {:.2e} grad iter {:.2e}",  cpu_time.as_millis(), ce_optimization.ce_compute_threaded());
         }
-        println!(" gradient iterations sys time(s) {:.2e} , cpu_time(s) {:.2e}",  sys_start.elapsed().unwrap().as_secs(), cpu_start.elapsed().as_secs());
+        info!(" gradient iterations sys time(s) {:.2e} , cpu_time(s) {:.2e}",  sys_start.elapsed().unwrap().as_secs(), cpu_start.elapsed().as_secs());
         let final_ce = ce_optimization.ce_compute_threaded();
-        println!(" final cross entropy value {:.2e}", final_ce);
+        info!(" final cross entropy value {:.2e}", final_ce);
         // return reindexed data (if possible)
         let dim = self.get_asked_dimension();
         let nbrow = self.get_nb_nodes();
@@ -705,10 +705,10 @@ impl <'a, F> EntropyOptim<'a,F>
         for s in &embedded_scales {
             scales_q.insert(*s);
         }
-        println!("\n\n embedded scales quantiles at 0.05 : {:.2e} , 0.5 :  {:.2e}, 0.95 : {:.2e}, 0.99 : {:.2e}", 
+        info!("\n\n embedded scales quantiles at 0.05 : {:.2e} , 0.5 :  {:.2e}, 0.95 : {:.2e}, 0.99 : {:.2e}", 
         scales_q.query(0.05).unwrap().1, scales_q.query(0.5).unwrap().1, 
         scales_q.query(0.95).unwrap().1, scales_q.query(0.99).unwrap().1);
-        println!("");  
+        info!("");  
         //
         EntropyOptim { node_params,  edges, embedded, embedded_scales, 
                             pos_edge_distribution : pos_edge_sampler,
@@ -1007,26 +1007,26 @@ pub(crate) fn to_proba_edges<F>(kgraph : & KGraph<F>, scale_rho : f32, beta : f3
                 node_params[*i] = param.1.clone();
             }
             (i, None) => {
-                println!("to_proba_edges , node rank {}, has no neighbour, use hnsw.set_keeping_pruned(true)", i);
+                info!("to_proba_edges , node rank {}, has no neighbour, use hnsw.set_keeping_pruned(true)", i);
                 log::error!("to_proba_edges , node rank {}, has no neighbour, use hnsw.set_keeping_pruned(true)", i);
                 std::process::exit(1);
             }
         };
     }
     // dump info on quantiles
-    println!("\n constructed initial space");
-    println!("\n scales quantile at 0.05 : {:.2e} , 0.5 :  {:.2e}, 0.95 : {:.2e}, 0.99 : {:.2e}", 
+    info!("\n constructed initial space");
+    info!("\n scales quantile at 0.05 : {:.2e} , 0.5 :  {:.2e}, 0.95 : {:.2e}, 0.99 : {:.2e}", 
     scale_q.query(0.05).unwrap().1, scale_q.query(0.5).unwrap().1, 
     scale_q.query(0.95).unwrap().1, scale_q.query(0.99).unwrap().1);
     //
-    println!("\n edge weight quantile at 0.05 : {:.2e} , 0.5 :  {:.2e}, 0.95 : {:.2e}, 0.99 : {:.2e}", 
+    info!("\n edge weight quantile at 0.05 : {:.2e} , 0.5 :  {:.2e}, 0.95 : {:.2e}, 0.99 : {:.2e}", 
     weight_q.query(0.05).unwrap().1, weight_q.query(0.5).unwrap().1, 
     weight_q.query(0.95).unwrap().1, weight_q.query(0.99).unwrap().1);
     //
-    println!("\n perplexity quantile at 0.05 : {:.2e} , 0.5 :  {:.2e}, 0.95 : {:.2e}, 0.99 : {:.2e}", 
+    info!("\n perplexity quantile at 0.05 : {:.2e} , 0.5 :  {:.2e}, 0.95 : {:.2e}, 0.99 : {:.2e}", 
     perplexity_q.query(0.05).unwrap().1, perplexity_q.query(0.5).unwrap().1, 
     perplexity_q.query(0.95).unwrap().1, perplexity_q.query(0.99).unwrap().1);
-    println!("");    
+    info!("");    
     //
     NodeParams::new(node_params, max_nbng)
 }  // end of construction of node params
