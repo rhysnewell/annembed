@@ -246,7 +246,7 @@ where
             let sys_start = SystemTime::now();
             initial_embedding = get_dmap_embedding(self.initial_space.as_ref().unwrap(), self.parameters.get_dimension(), None);
             info!(" dmap initialization sys time(ms) {:.2e} cpu time(ms) {:.2e}", sys_start.elapsed().unwrap().as_millis(), cpu_start.elapsed().as_millis());
-            set_data_box(&mut initial_embedding, 1.);
+            set_data_box(&mut initial_embedding, 1.)?;
         }
         else {
         // if we use random initialization we must have a box size coherent with renormalizes scales, so box size is 1.
@@ -1215,7 +1215,7 @@ fn estimate_embedded_scales_from_initial_scales(initial_scales :&Vec<f32>) -> Ve
 
 
 // renormalize data (center and enclose in a box of a given box size) before optimization of cross entropy
-fn set_data_box<F>(data : &mut Array2<F>, box_size : f64) 
+fn set_data_box<F>(data : &mut Array2<F>, box_size : f64) -> Result<f64, usize>
     where  F: Float +  NumAssign + std::iter::Sum<F> + num_traits::cast::FromPrimitive + ndarray::ScalarOperand  {
     let nbdata = data.nrows();
     let dim = data.ncols();
@@ -1239,7 +1239,9 @@ fn set_data_box<F>(data : &mut Array2<F>, box_size : f64)
     max_max /= F::from(0.5 * box_size).unwrap();
     for f in data.iter_mut()  {
         *f = (*f)/max_max;
-        assert!((*f).abs() <= F::one());
+        if !((*f).abs() <= F::one()) {
+            return Err(1);
+        }
     }    
 }  // end of set_data_box
 
