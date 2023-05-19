@@ -1215,7 +1215,7 @@ fn estimate_embedded_scales_from_initial_scales(initial_scales :&Vec<f32>) -> Ve
 
 
 // renormalize data (center and enclose in a box of a given box size) before optimization of cross entropy
-fn set_data_box<F>(data : &mut Array2<F>, box_size : f64) -> Result<f64, usize>
+fn set_data_box<F>(data : &mut Array2<F>, box_size : f64) -> Result<usize, usize>
     where  F: Float +  NumAssign + std::iter::Sum<F> + num_traits::cast::FromPrimitive + ndarray::ScalarOperand  {
     let nbdata = data.nrows();
     let dim = data.ncols();
@@ -1242,7 +1242,8 @@ fn set_data_box<F>(data : &mut Array2<F>, box_size : f64) -> Result<f64, usize>
         if !((*f).abs() <= F::one()) {
             return Err(1);
         }
-    }    
+    }
+    Ok(1)
 }  // end of set_data_box
 
 
