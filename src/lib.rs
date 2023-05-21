@@ -30,7 +30,7 @@ lazy_static! {
 // install a logger facility
 fn init_log() -> u64 {
     let _res = env_logger::try_init();
-    println!("\n ************** initializing logger *****************\n");    
+    log::info!("\n ************** initializing logger *****************\n");    
     return 1;
 }
 

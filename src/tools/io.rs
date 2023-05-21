@@ -65,7 +65,7 @@ pub(crate) fn get_header_size(filepath : &Path) -> anyhow::Result<usize> {
     let fileres = OpenOptions::new().read(true).open(&filepath);
     if fileres.is_err() {
         log::error!("fn get_header_size : could not open file {:?}", filepath.as_os_str());
-        println!("fn get_header_size : could not open file {:?}", filepath.as_os_str());
+        log::info!("fn get_header_size : could not open file {:?}", filepath.as_os_str());
         return Err(anyhow!("fn get_header_size : could not open file {}", filepath.display()));            
     }
     let mut file = fileres?;
@@ -104,7 +104,7 @@ pub fn get_toembed_from_csv<F> (filepath : &Path, delim : u8) -> anyhow::Result<
     let fileres = OpenOptions::new().read(true).open(&filepath);
     if fileres.is_err() {
         log::error!("ProcessingState reload_json : reload could not open file {:?}", filepath.as_os_str());
-        println!("directed_from_csv could not open file {:?}", filepath.as_os_str());
+        log::info!("directed_from_csv could not open file {:?}", filepath.as_os_str());
         return Err(anyhow!("directed_from_csv could not open file {}", filepath.display()));            
     }
     let file = fileres?;
@@ -137,7 +137,7 @@ pub fn get_toembed_from_csv<F> (filepath : &Path, delim : u8) -> anyhow::Result<
         }
         else {
             if record.len() != nb_fields {
-                println!("non constant number of fields at record {} first record has {}",num_record,  nb_fields);
+                log::info!("non constant number of fields at record {} first record has {}",num_record,  nb_fields);
                 return Err(anyhow!("non constant number of fields at record {} first record has {}",num_record,  nb_fields));   
             }
             // We have a new vector with nb_fields to parse

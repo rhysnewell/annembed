@@ -72,7 +72,7 @@ impl <F> KGraphProjection<F>
         // check number of points kept in
         if layer >= max_level_observed {
             log::error!("KGraphProjection::new, layer argument greater than nb_layer!!, layer : {}", layer);
-            println!("KGraphProjection::new, layer argument greater than nb_layer!!, layer : {}", layer);
+            log::info!("KGraphProjection::new, layer argument greater than nb_layer!!, layer : {}", layer);
         }
         for l in (layer..=max_level_observed).rev() {
             nb_point_to_collect += hnsw.get_point_indexation().get_layer_nb_point(l);
@@ -80,7 +80,7 @@ impl <F> KGraphProjection<F>
         }
         if nb_point_to_collect <= 0 {
             log::error!("!!!!!!!!!!!! KGraphProjection cannot collect points !!!!!!!!!!!!!, check layer argument");
-            println!("!!!!!!!!!!!! KGraphProjection cannot collect points !!!!!!!!!!!!!, check layer argument");
+            log::info!("!!!!!!!!!!!! KGraphProjection cannot collect points !!!!!!!!!!!!!, check layer argument");
             std::process::exit(1);
         }
         //
@@ -408,7 +408,7 @@ use rand::prelude::*;
 fn log_init_test() {
     let res = env_logger::builder().is_test(true).try_init();
     if res.is_err() {
-        println!("could not init log");
+        log::info!("could not init log");
     }
 }  // end of log_init_test
 
@@ -434,7 +434,7 @@ fn test_graph_projection() {
     let dim = 30;
     let knbn = 10;
     //
-    println!("\n\n test_graph_projection nb_elem {:?}", nb_elem);
+    log::info!("\n\n test_graph_projection nb_elem {:?}", nb_elem);
     //
     let data = gen_rand_data_f32(nb_elem, dim);
     let data_with_id : Vec<(&Vec<f32>, usize)> = data.iter().zip(0..data.len()).collect();

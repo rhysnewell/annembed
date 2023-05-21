@@ -759,14 +759,14 @@ impl <'a, F> SvdApprox<'a, F>
         let layout = MatrixLayout::C { row: b.shape()[0] as i32, lda: b.shape()[1] as i32 };
         let slice_for_svd_opt = b.as_slice_mut();
         if slice_for_svd_opt.is_none() {
-            println!("direct_svd Matrix cannot be transformed into a slice : not contiguous or not in standard order");
+            log::info!("direct_svd Matrix cannot be transformed into a slice : not contiguous or not in standard order");
             return Err(String::from("not contiguous or not in standard order"));
         }
         // use divide conquer (calls lapack gesdd), faster but could use svd (lapack gesvd)
         log::trace!("direct_svd calling svddc driver");
         let res_svd_b = F::svddc(layout,  JobSvd::Some, slice_for_svd_opt.unwrap());
         if res_svd_b.is_err()  {
-            println!("direct_svd, svddc failed");
+            log::info!("direct_svd, svddc failed");
         };
         // we have to decode res and fill in SvdApprox fields.
         // lax does encapsulte dgesvd (double) and sgesvd (single)  which returns U and Vt as vectors.

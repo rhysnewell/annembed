@@ -118,8 +118,8 @@ impl <'a, T, D> ToRipserer<'a,T, D>
         let graph_projection = KGraphProjection::<f32>::new(&self.hnsw, knbn , layer);
         let quant = graph_projection.get_projection_distance_quant();
         if quant.count() > 0 {
-            println!("\n\n projection distance from lower layers to upper layers");
-            println!("\n quantile at 0.05 : {:.2e} , 0.5 :  {:.2e}, 0.95 : {:.2e}, 0.99 : {:.2e}", 
+            log::info!("\n\n projection distance from lower layers to upper layers");
+            log::info!("\n quantile at 0.05 : {:.2e} , 0.5 :  {:.2e}, 0.95 : {:.2e}, 0.99 : {:.2e}", 
                     quant.query(0.05).unwrap().1, quant.query(0.5).unwrap().1, 
                     quant.query(0.95).unwrap().1, quant.query(0.99).unwrap().1);
         }

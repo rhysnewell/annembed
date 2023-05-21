@@ -326,13 +326,13 @@ impl <F> KGraph<F>
             mean_in_degree /= in_degrees.len() as f32;
         }
         //
-        println!("\n minimal graph statistics \n");
-        println!("\t max in degree : {:.2e}", max_in_degree);
-        println!("\t mean in degree : {:.2e}", mean_in_degree);
-        println!("\t max max range : {:.2e} ", max_max_r.to_f32().unwrap());
-        println!("\t min min range : {:.2e} ", min_min_r.to_f32().unwrap());
+        log::info!("\n minimal graph statistics \n");
+        log::info!("\t max in degree : {:.2e}", max_in_degree);
+        log::info!("\t mean in degree : {:.2e}", mean_in_degree);
+        log::info!("\t max max range : {:.2e} ", max_max_r.to_f32().unwrap());
+        log::info!("\t min min range : {:.2e} ", min_min_r.to_f32().unwrap());
         if quant.count() > 0 {
-            println!("min radius quantile at 0.05 : {:.2e} , 0.5 :  {:.2e}, 0.95 : {:.2e}, 0.99 : {:.2e}", 
+            log::info!("min radius quantile at 0.05 : {:.2e} , 0.5 :  {:.2e}, 0.95 : {:.2e}, 0.99 : {:.2e}", 
                         quant.query(0.05).unwrap().1, quant.query(0.5).unwrap().1, 
                         quant.query(0.95).unwrap().1, quant.query(0.99).unwrap().1);
         }
@@ -368,7 +368,7 @@ pub fn kgraph_from_hnsw_all<T, D, F>(hnsw : &Hnsw<T,D>, nbng : usize) -> std::re
     // check consistency between max_nb_conn and nbng
     if max_nb_conn < nbng {
         log::info!("init_from_hnsw_all: number of neighbours must be less than hnsw max_nb_connection : {} ", max_nb_conn);
-        println!("init_from_hnsw_all: number of neighbours must be less than hnsw max_nb_connection : {} ", max_nb_conn);
+        log::info!("init_from_hnsw_all: number of neighbours must be less than hnsw max_nb_connection : {} ", max_nb_conn);
     }
     let point_indexation = hnsw.get_point_indexation();
     let nb_point = point_indexation.get_nb_point();
@@ -436,8 +436,8 @@ pub fn kgraph_from_hnsw_all<T, D, F>(hnsw : &Hnsw<T,D>, nbng : usize) -> std::re
     if mean_nbng < nbng as f64 {
         log::warn!(" mean number of neighbours obtained : {:.3e}", mean_nbng);
         log::warn!(" possibly use hnsw.set_keeping_pruned(true)");
-        println!(" mean number of neighbours obtained : {:.3e}", mean_nbng);
-        println!(" possibly use hnsw.set_keeping_pruned(true)");
+        log::info!(" mean number of neighbours obtained : {:.3e}", mean_nbng);
+        log::info!(" possibly use hnsw.set_keeping_pruned(true)");
     }
     //
     Ok(KGraph{max_nbng, nbnodes, neighbours, node_set})
@@ -541,8 +541,8 @@ pub fn kgraph_from_hnsw_all<T, D, F>(hnsw : &Hnsw<T,D>, nbng : usize) -> std::re
                 nb_point_below_nbng,  mean_deficient_neighbour_size as f64/nb_point_below_nbng as f64);
         }
         if mean_nbng < nbng as f64 {
-            println!(" mean number of neighbours obtained : {:.3e}", mean_nbng);
-            println!(" possibly use hnsw.reset_keeping_pruned(true)");
+            log::info!(" mean number of neighbours obtained : {:.3e}", mean_nbng);
+            log::info!(" possibly use hnsw.reset_keeping_pruned(true)");
         }
         //
         Ok(KGraph{max_nbng, nbnodes, neighbours, node_set})
@@ -578,7 +578,7 @@ use crate::fromhnsw::hubness;
 fn log_init_test() {
     let res = env_logger::builder().is_test(true).try_init();
     if res.is_err() {
-        println!("could not init log");
+        log::info!("could not init log");
     }
 }  // end of log_init_test
 
@@ -608,7 +608,7 @@ fn test_full_hnsw() {
     let knbn = 20;
     //
     log::debug!("test_full_hnsw");
-    println!("\n\n test_serial nb_elem {:?}", nb_elem);
+    log::info!("\n\n test_serial nb_elem {:?}", nb_elem);
     //
     let data = gen_rand_data_f32(nb_elem, dim);
     let data_with_id = data.iter().zip(0..data.len()).collect();
@@ -629,14 +629,14 @@ fn test_full_hnsw() {
     // make a test for dimension estimation
     let id = 10;
     let dimension = kgraph.intrinsic_dim_at_data_id(&id).unwrap();
-    println!("dimension around point : {}, dim = {:.3e}", id, dimension);
+    log::info!("dimension around point : {}, dim = {:.3e}", id, dimension);
     log::info!("\n dimension around point : {}, dim = {:.3e}", id, dimension);
     //
     let dimension =  kgraph.estimate_intrinsic_dim(10000);
     assert!(dimension.is_ok());
     let dimension = dimension.unwrap();
     log::info!("\n estimation of dimension : {:.3e}, sigma : {:.3e} ", dimension.0 , dimension.1);
-    println!("\n estimation of dimension : {:.3e}, sigma : {:.3e} ", dimension.0 , dimension.1);
+    log::info!("\n estimation of dimension : {:.3e}, sigma : {:.3e} ", dimension.0 , dimension.1);
     // test hubness estimation
     let hubness = self::hubness::Hubness::new(&kgraph);
     let s3 = hubness.get_standard3m();
@@ -654,7 +654,7 @@ fn test_layer_hnsw() {
     let dim = 30;
     let knbn = 20;
     //
-    println!("\n\n test_serial nb_elem {:?}", nb_elem);
+    log::info!("\n\n test_serial nb_elem {:?}", nb_elem);
     //
     let data = gen_rand_data_f32(nb_elem, dim);
     let data_with_id : Vec<(&Vec<f32>, usize)> = data.iter().zip(0..data.len()).collect();

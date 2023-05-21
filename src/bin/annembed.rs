@@ -214,7 +214,7 @@ fn get_kgraphproj_with_distname(data_with_id : &Vec<(&Vec<f64>, usize)>, hnswpar
 
 
 pub fn main() {
-    println!("initializing default logger from environment ...");
+    log::info!("initializing default logger from environment ...");
     let _ = env_logger::Builder::from_default_env().init();
     log::info!("logger initialized from default environment");
     //
@@ -319,7 +319,7 @@ pub fn main() {
             Ok(params) => { hnswparams = params; },
             _                      => { 
                                         log::error!("parsing hnsw command failed");
-                                        println!("exiting with error {}", res.err().as_ref().unwrap());
+                                        log::info!("exiting with error {}", res.err().as_ref().unwrap());
                                         //  log::error!("exiting with error {}", res.err().unwrap());
                                         std::process::exit(1);                                
             },
@@ -338,7 +338,7 @@ pub fn main() {
             Ok(params) => { embedparams = params; },
             _                      => { 
                                         log::error!("parsing embed cmd failed");
-                                        println!("exiting with error {}", res.err().as_ref().unwrap());
+                                        log::info!("exiting with error {}", res.err().as_ref().unwrap());
                                         //  log::error!("exiting with error {}", res.err().unwrap());
                                         std::process::exit(1);                                
             },
@@ -388,7 +388,7 @@ pub fn main() {
     if embedparams.get_hierarchy_layer() == 0 {
         let kgraph = get_kgraph_with_distname(&data_with_id, &hnswparams, nb_layer);
         let cpu_time: Duration = cpu_start.elapsed();
-        println!(" graph construction sys time(s) {:?} cpu time {:?}", sys_now.elapsed().unwrap().as_secs(), cpu_time.as_secs());
+        log::info!(" graph construction sys time(s) {:?} cpu time {:?}", sys_now.elapsed().unwrap().as_secs(), cpu_time.as_secs());
         let mut embedder = Embedder::new(&kgraph, embedparams);
         let embed_res = embedder.embed();
         if embed_res.is_err() {

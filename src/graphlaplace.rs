@@ -55,7 +55,7 @@ impl GraphLaplacian {
 
         let slice_for_svd_opt = b.as_slice_mut();
         if slice_for_svd_opt.is_none() {
-            println!("direct_svd Matrix cannot be transformed into a slice : not contiguous or not in standard order");
+            log::info!("direct_svd Matrix cannot be transformed into a slice : not contiguous or not in standard order");
             return Err(String::from("not contiguous or not in standard order"));
         }
         // use divide conquer (calls lapack gesdd), faster but could use svd (lapack gesvd)
@@ -94,7 +94,7 @@ impl GraphLaplacian {
         let svd_res = svdapprox.direct_svd(svdmode);
         log::trace!("exited svd");
         if !svd_res.is_ok() {
-            println!("svd approximation failed");
+            log::info!("svd approximation failed");
             std::panic!();
         }
         return svd_res;

@@ -118,13 +118,13 @@ impl <'a,F> Hubness<'a,F>
         }
         // display result
         if nb_out_histo > 0 {
-            println!("number of too large values : {}, maximum value : {}", nb_out_histo, max_value);
+            log::info!("number of too large values : {}, maximum value : {}", nb_out_histo, max_value);
         }
         let quantiles = vec![0.1, 0.25, 0.5, 0.75, 0.9 , 0.99, 0.999, 0.9999];
         let thresholds = quantiles.iter().map(|f| histo.value_at_quantile(*f)).collect::<Vec<u64>>();
         //
-        println!("quantiles : {:?}", quantiles);
-        println!("thresholds : {:?}", thresholds);
+        log::info!("quantiles : {:?}", quantiles);
+        log::info!("thresholds : {:?}", thresholds);
         //
         Ok(histo)
     }  // end of get_hubness_histogram
